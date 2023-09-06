@@ -1,4 +1,3 @@
-import Autocomplete from "@/components/AutoComplete";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -11,6 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import SkillList from "@/components/SkillList";
+import { SKILL_TABLE_NAME } from "@/lib/constant";
+import AutoComplete from "@/components/AutoComplete";
+import { SkillsProvider } from "@/components/SkillsProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +24,7 @@ export default async function Index() {
   } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from("skills")
+    .from(SKILL_TABLE_NAME)
     .select()
     .order("sequence_number", {
       ascending: true,
@@ -61,9 +63,11 @@ export default async function Index() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Autocomplete items={data || []} />
-            <br />
-            <SkillList skills={data || []} />
+            <SkillsProvider skills={data || []}>
+              <AutoComplete />
+              <br />
+              <SkillList />
+            </SkillsProvider>
           </CardContent>
         </Card>
       )}

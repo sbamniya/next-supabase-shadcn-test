@@ -1,10 +1,12 @@
 "use client";
 
+import { SKILL_TABLE_NAME } from "@/lib/constant";
+import { supabaseClient } from "@/lib/superbase";
 import { DndContext } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
+import { useSkillsContext } from "./SkillsProvider";
 import { SortableItem } from "./SortableItem";
-import useSkills from "@/lib/hooks/useSkill";
 
 export type Skill = {
   id: string;
@@ -13,37 +15,31 @@ export type Skill = {
   created_at: string;
 };
 
-type SkillListProps = {
-  skills: Skill[];
-};
+const SkillList = () => {
+  const skillData = useSkillsContext();
+  const realtimeSkills = skillData?.skills || [];
 
-const SkillList = ({ skills }: SkillListProps) => {
-  const realtimeSkills = useSkills(skills);
   const [items, setItem] = useState(realtimeSkills);
 
   useEffect(() => {
     setItem(realtimeSkills);
   }, [realtimeSkills]);
 
-  const handleDragEnd = (event: any) => {
-    const { active, over, delta } = event;
-
-    if (delta.x < 0 || delta.y < 0) {
-      console.log("delete the item.......");
-      return false;
-    }
-
-    console.log(active, over, delta);
-
-    console.log("event", event);
+  const handleDragEnd = async (event: any) => {
+    const { active, over } = event;
 
     if (over && active.id !== over?.id) {
-      setItem((items) => {
-        const oldIndex = items.indexOf(active.id);
-        const newIndex = items.indexOf(over.id);
+      const oldIndex = items.findIndex(({ id }) => id === active.id);
+      const newIndex = items.findIndex(({ id }) => id === over.id);
 
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      const newItems = arrayMove(items, oldIndex, newIndex);
+      skillData?.setSkills(newItems);
+
+      await supabaseClient
+        .from(SKILL_TABLE_NAME)
+        .upsert(
+          newItems.map((obj, sequence_number) => ({ ...obj, sequence_number }))
+        );
     }
   };
 
