@@ -11,12 +11,7 @@ import { supabaseClient } from "@/lib/superbase";
 import { cn } from "@/lib/utils";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check } from "lucide-react";
-import {
-  useCallback,
-  useRef,
-  useState,
-  type KeyboardEvent
-} from "react";
+import { useCallback, useRef, useState, type KeyboardEvent } from "react";
 import { useSkillsContext } from "./SkillsProvider";
 
 type Option = {
@@ -61,6 +56,13 @@ const AutoComplete = () => {
 
   const [inputValue, setInputValue] = useState<string>();
 
+  const createNewItem = async (skill: string) => {
+    await supabaseClient.from(SKILL_TABLE_NAME).insert({
+      skill,
+      sequence_number: selected.length + 1,
+    });
+  };
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
       const input = inputRef.current;
@@ -78,10 +80,10 @@ const AutoComplete = () => {
         );
         if (optionToSelect) {
           setSelected([optionToSelect]);
-          input.value = "";
         } else {
-          console.log("create new");
+          createNewItem(input.value);
         }
+        input.value = "";
       }
 
       if (event.key === "Escape") {
@@ -117,12 +119,12 @@ const AutoComplete = () => {
       }, 0);
 
       if (!isPreviouslySelected) {
-        await supabaseClient.from(SKILL_TABLE_NAME).insert({
-          skill: selectedOption.label,
-          sequence_number: selected.length + 1,
-        });
+        createNewItem(selectedOption.label);
       } else {
-        await supabaseClient.from(SKILL_TABLE_NAME).delete().eq("skill", selectedOption.label)
+        await supabaseClient
+          .from(SKILL_TABLE_NAME)
+          .delete()
+          .eq("skill", selectedOption.label);
       }
     },
     [selected]

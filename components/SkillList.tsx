@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { useSkillsContext } from "./SkillsProvider";
 import { SortableItem } from "./SortableItem";
+import SwipeableListItem from "./SwipeableList/SwipeableListItem";
 
 export const restrictToVerticalAxis: Modifier = ({ transform }) => {
   return {
@@ -54,6 +55,10 @@ const SkillList = () => {
     }
   };
 
+  const onDelete = async (id: string) => {
+    await supabaseClient.from(SKILL_TABLE_NAME).delete().eq("id", id);
+  };
+
   return (
     <div>
       <DndContext
@@ -63,9 +68,11 @@ const SkillList = () => {
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
           {items.map(({ id, skill }) => (
             <SortableItem key={id} id={id}>
-              <div className="w-full p-2 border-2	border-slate-200 rounded-sm">
-                {skill}
-              </div>
+              <SwipeableListItem onDelete={() => onDelete(id)}>
+                <div className="w-full p-2 border-2	border-slate-200 rounded-sm">
+                  {skill}
+                </div>
+              </SwipeableListItem>
             </SortableItem>
           ))}
         </SortableContext>
