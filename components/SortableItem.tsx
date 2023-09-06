@@ -14,7 +14,7 @@ export const SortableItem = ({ children, id }: Props) => {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    padding: 10
+    padding: 10,
   };
 
   return (

@@ -2,11 +2,22 @@
 
 import { SKILL_TABLE_NAME } from "@/lib/constant";
 import { supabaseClient } from "@/lib/superbase";
-import { DndContext } from "@dnd-kit/core";
-import { arrayMove, SortableContext } from "@dnd-kit/sortable";
+import { DndContext, Modifier } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
 import { useSkillsContext } from "./SkillsProvider";
 import { SortableItem } from "./SortableItem";
+
+export const restrictToVerticalAxis: Modifier = ({ transform }) => {
+  return {
+    ...transform,
+    x: 0,
+  };
+};
 
 export type Skill = {
   id: string;
@@ -45,8 +56,11 @@ const SkillList = () => {
 
   return (
     <div>
-      <DndContext onDragEnd={handleDragEnd}>
-        <SortableContext items={items}>
+      <DndContext
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToVerticalAxis]}
+      >
+        <SortableContext items={items} strategy={verticalListSortingStrategy}>
           {items.map(({ id, skill }) => (
             <SortableItem key={id} id={id}>
               <div className="w-full p-2 border-2	border-slate-200 rounded-sm">
