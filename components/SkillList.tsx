@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { useSkillsContext } from "./SkillsProvider";
 import { SortableItem } from "./SortableItem";
-import SwipeableListItem from "./SwipeableList/SwipeableListItem";
+import SwipeableListItem from "./SwipeableList";
 
 export const restrictToVerticalAxis: Modifier = ({ transform }) => {
   return {

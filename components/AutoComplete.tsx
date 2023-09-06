@@ -11,7 +11,13 @@ import { supabaseClient } from "@/lib/superbase";
 import { cn } from "@/lib/utils";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check } from "lucide-react";
-import { useCallback, useRef, useState, type KeyboardEvent } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  useEffect,
+} from "react";
 import { useSkillsContext } from "./SkillsProvider";
 
 type Option = {
@@ -44,17 +50,21 @@ const AutoComplete = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const skillData = useSkillsContext();
-  const skills = skillData?.skills || [];
-
-  const databaseOptions = (skills || []).map(({ skill }) => ({
-    label: skill,
-    value: skill,
-  }));
 
   const [isOpen, setOpen] = useState(false);
-  const [selected, setSelected] = useState<Option[]>(databaseOptions);
+  const [selected, setSelected] = useState<Option[]>([]);
 
   const [inputValue, setInputValue] = useState<string>();
+
+  useEffect(() => {
+    const skills = skillData?.skills || [];
+
+    const databaseOptions = (skills || []).map(({ skill }) => ({
+      label: skill,
+      value: skill,
+    }));
+    setSelected(databaseOptions);
+  }, [skillData?.skills]);
 
   const createNewItem = async (skill: string) => {
     await supabaseClient.from(SKILL_TABLE_NAME).insert({
@@ -130,7 +140,7 @@ const AutoComplete = () => {
     [selected]
   );
 
-  const combinedOptions = [...OPTIONS, ...databaseOptions];
+  const combinedOptions = [...OPTIONS, ...selected];
   const finalOptions = combinedOptions.filter(
     (option, index) =>
       combinedOptions.findIndex((op) => op.label === option.label) === index

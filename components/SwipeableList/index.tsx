@@ -1,4 +1,4 @@
-import "./SwipeableList.css";
+import styles from "./styles.module.css";
 import React, { useRef, useEffect } from "react";
 
 function SwipeableListItem({
@@ -28,8 +28,6 @@ function SwipeableListItem({
   }
 
   function onDragStartTouch(evt: any) {
-    console.log(evt.targetTouches);
-    console.log(evt.targetTouches[0]);
     const touch = evt.targetTouches[0];
     onDragStart(touch.clientX);
     window.addEventListener("touchmove", onTouchMove);
@@ -40,7 +38,10 @@ function SwipeableListItem({
     dragStartXRef.current = clientX;
 
     if (listElementRef.current) {
-      listElementRef.current.className = "ListItem";
+      listElementRef.current.className = styles["list-item"];
+    }
+    if (backgroundRef.current) {
+      backgroundRef.current.style.display = "flex";
     }
 
     requestAnimationFrame(updatePosition);
@@ -100,20 +101,23 @@ function SwipeableListItem({
         leftRef.current = 0;
       }
       if (listElementRef.current) {
-        listElementRef.current.className = "BouncingListItem";
+        listElementRef.current.className = styles["bouncing-list-item"];
         listElementRef.current.style.transform = `translateX(${leftRef.current}px)`;
+      }
+      if (backgroundRef.current) {
+        backgroundRef.current.style.display = "none";
       }
     }
   }
 
   return (
     <>
-      <div className="Wrapper" ref={wrapperRef}>
-        <div className="Background" ref={backgroundRef}>
-          <span>delete</span>
+      <div className={styles["wrapper"]} ref={wrapperRef}>
+        <div className={styles["background"]} ref={backgroundRef}>
+          <span>Swipe to Delete</span>
         </div>
         <div
-          className="BouncingListItem"
+          className={styles["bouncing-list-item"]}
           ref={listElementRef}
           onMouseDown={onDragStartMouse}
           onTouchStart={onDragStartTouch}
