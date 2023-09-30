@@ -1,7 +1,5 @@
 # Supabase + Next.js Test
 
-This repo contains the code for the test provided by [Bogdan Serebryakov](https://github.com/Bogdan1001) through Upwork.
-
 ## Step to run this locally.
 
 To run the application locally, you need to have Supabase setup either on the local or has an account on cloud.
